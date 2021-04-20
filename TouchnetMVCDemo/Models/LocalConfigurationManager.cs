@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Cmc.Core.Configuration;
+using System;
 using System.Collections.Specialized;
 using System.Configuration;
-using System.Linq;
-using System.Web;
-using Cmc.Core.Configuration;
 
 namespace TouchnetMVCDemo.Models
 {

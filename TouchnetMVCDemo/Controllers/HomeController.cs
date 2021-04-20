@@ -1,22 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.Mvc;
-using Cmc.Core.ComponentModel;
+﻿using Cmc.Core.ComponentModel;
 using Cmc.Core.Configuration;
+using Cmc.Core.DocumentProvider.Interfaces;
+using Cmc.Core.DocumentProvider.Messages;
 using Cmc.Core.PaymentProvider.Interfaces;
 using Cmc.Core.PaymentProvider.Messages;
+using System;
+using System.Linq;
+using System.Web.Mvc;
+using GetOrRedirectToProviderUrlRequest = Cmc.Core.PaymentProvider.Messages.GetOrRedirectToProviderUrlRequest;
 
 namespace TouchnetMVCDemo.Controllers
 {
     public class HomeController : Controller
     {
-        [HttpPost]
+        [HttpGet, HttpPost]
         public ActionResult Index()
         {
-           
-           
+
+            GetOrUploadDocumentToExternalDocumentManagementProvider(DocRequestType.Upload);
 
             return View();
         }
@@ -39,7 +40,7 @@ namespace TouchnetMVCDemo.Controllers
                     UserDefinedField1 = Guid.NewGuid().ToString(), // used for reference
                     UserDefinedField2 = "Touchnet",
                     UserDefinedField4 = "1",
-                    UserDefinedField7="digest",
+                    UserDefinedField7 = "digest",
                     CorrelationId = Guid.NewGuid().ToString(),
                     TransactionType = "S",
                     //ProviderInfo = new PaymentProviderInfo
@@ -113,12 +114,55 @@ namespace TouchnetMVCDemo.Controllers
         {
             ViewBag.Message = "Your contact page.";
 
+            GetOrUploadDocumentToExternalDocumentManagementProvider(DocRequestType.Upload);
+
             return View();
         }
 
         private string GetBaseUrl()
         {
             return string.Format("{0}://{1}{2}", Request.Url.Scheme, Request.Url.Authority, Url.Content("~"));
+        }
+
+
+        private void GetOrUploadDocumentToExternalDocumentManagementProvider(DocRequestType docRequestType)
+        {
+            //var _logger = ServiceLocator.Default.GetInstance<ILoggerFactory>().GetLogger("Document Imaging");
+            var documentAdaptor = ServiceLocator.Default.GetAllInstances<IDocumentAdaptor>().FirstOrDefault();
+            //var percepectivepAdaptor = paymentServices.FirstOrDefault(svc => svc.GetType().Name.IndexOf("Cashnet", StringComparison.OrdinalIgnoreCase) >= 0);
+            //using (new LogScope(_logger))
+            {
+                var getOrRedirectToProviderUrlRequest = new Cmc.Core.DocumentProvider.Messages.GetOrRedirectToProviderUrlRequest()
+                {
+                    AutoRedirect = true,
+                    DocRequestType = docRequestType,
+                    DocumentDetails = new DocumentDetails
+                    {
+                        CmcDocumentId = 12587,
+                        DocumentName = "Sample",
+                        DocumentType = "Sample001",
+                        Module = "Engage",
+                        ProviderDocumentId = string.Empty,
+                        StudentId = 12587,
+                        StudentName = "Ayyappa",
+                        StudentNumber = "Student001"
+                    },
+                    ProviderInfo = new DocumentProviderInfo
+                    {
+                        BaseUrl = "https://cltpocfe1.campusmgmt.com:8443/Experience",
+                        CaptureProfile = "Web Client Capture",
+                        CustomerFolder = "321Z2CF_00007EHH000001J",
+                        Username = "",
+                        Password = ""
+                    }
+                };
+
+                var response = documentAdaptor.GetOrRedirectToProviderUrl(getOrRedirectToProviderUrlRequest);
+                if (response.DocumentException != null)
+                {
+
+                }
+            }
         }
     }
 }

@@ -1,10 +1,10 @@
-﻿using System;
-using System.Linq;
-using System.Web;
-using Cmc.Core.ComponentModel;
+﻿using Cmc.Core.ComponentModel;
 using Cmc.Core.Diagnostics;
 using Cmc.Core.PaymentProvider.Interfaces;
 using Cmc.Core.PaymentProvider.Messages;
+using System;
+using System.Linq;
+using System.Web;
 
 namespace TouchnetMVCDemo.App_Data
 {
@@ -55,7 +55,7 @@ namespace TouchnetMVCDemo.App_Data
                     {
                         CorrelationId = transactionDetails.TransactionResponse.TransactionCode,
                         TransactionId = transactionDetails.TransactionResponse.SecureToken,
-                        PaymentProviderInfo =  new PaymentProviderInfo()
+                        PaymentProviderInfo = new PaymentProviderInfo()
                         {
                             MerchantCode = "191",
                             Partner = "Touchnet",
